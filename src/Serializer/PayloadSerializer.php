@@ -10,6 +10,7 @@ use Sentry\Options;
 use Sentry\Serializer\EnvelopItems\CheckInItem;
 use Sentry\Serializer\EnvelopItems\EventItem;
 use Sentry\Serializer\EnvelopItems\MetricsItem;
+use Sentry\Serializer\EnvelopItems\ProfileChunkItem;
 use Sentry\Serializer\EnvelopItems\ProfileItem;
 use Sentry\Serializer\EnvelopItems\TransactionItem;
 use Sentry\Tracing\DynamicSamplingContext;
@@ -54,7 +55,7 @@ final class PayloadSerializer implements PayloadSerializerInterface
             $entries = $dynamicSamplingContext->getEntries();
 
             if (!empty($entries)) {
-                $envelopeHeader['trace'] = $entries;
+                //$envelopeHeader['trace'] = $entries;
             }
         }
 
@@ -81,7 +82,13 @@ final class PayloadSerializer implements PayloadSerializerInterface
             case EventType::metrics():
                 $items = MetricsItem::toEnvelopeItem($event);
                 break;
+            case EventType::profileChunk():
+                    $items = ProfileChunkItem::toEnvelopeItem($event);
+                    break;
         }
+
+        debug(\sprintf("%s\n%s", JSON::encode($envelopeHeader), $items));
+        exit;
 
         return \sprintf("%s\n%s", JSON::encode($envelopeHeader), $items);
     }

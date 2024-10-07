@@ -148,9 +148,9 @@ final class Transaction extends Span
      */
     public function finish(?float $endTimestamp = null): ?EventId
     {
-        if ($this->profiler !== null) {
-            $this->profiler->stop();
-        }
+        // if ($this->profiler !== null) {
+        //     $this->profiler->stop();
+        // }
 
         if ($this->endTimestamp !== null) {
             // Transaction was already finished once and we don't want to re-flush it
@@ -183,12 +183,12 @@ final class Transaction extends Span
         $event->setSdkMetadata('dynamic_sampling_context', $this->getDynamicSamplingContext());
         $event->setSdkMetadata('transaction_metadata', $this->getMetadata());
 
-        if ($this->profiler !== null) {
-            $profile = $this->profiler->getProfile();
-            if ($profile !== null) {
-                $event->setSdkMetadata('profile', $profile);
-            }
-        }
+        // if ($this->profiler !== null) {
+        //     $profile = $this->profiler->getProfile();
+        //     if ($profile !== null) {
+        //         $event->setSdkMetadata('profile', $profile);
+        //     }
+        // }
 
         if (!empty($this->getMetricsSummary())) {
             $event->setMetricsSummary($this->getMetricsSummary());

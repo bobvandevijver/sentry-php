@@ -14,6 +14,7 @@ use Sentry\EventHint;
 use Sentry\EventId;
 use Sentry\Integration\IntegrationInterface;
 use Sentry\MonitorConfig;
+use Sentry\Profiling\Profiler;
 use Sentry\Severity;
 use Sentry\Tracing\SamplingContext;
 use Sentry\Tracing\Span;
@@ -34,6 +35,11 @@ class Hub implements HubInterface
      * @var EventId|null The ID of the last captured event
      */
     private $lastEventId;
+
+    /**
+     * @var Profiler|null Reference instance to the {@see Profiler}
+     */
+    protected $profiler;
 
     /**
      * Hub constructor.
@@ -317,16 +323,16 @@ class Hub implements HubInterface
 
         $transaction->initSpanRecorder();
 
-        $profilesSampleRate = $options->getProfilesSampleRate();
-        if ($profilesSampleRate === null) {
-            $logger->info(\sprintf('Transaction [%s] is not profiling because `profiles_sample_rate` option is not set.', (string) $transaction->getTraceId()));
-        } elseif ($this->sample($profilesSampleRate)) {
-            $logger->info(\sprintf('Transaction [%s] started profiling because it was sampled.', (string) $transaction->getTraceId()));
+        // $profilesSampleRate = $options->getProfilesSampleRate();
+        // if ($profilesSampleRate === null) {
+        //     $logger->info(\sprintf('Transaction [%s] is not profiling because `profiles_sample_rate` option is not set.', (string) $transaction->getTraceId()));
+        // } elseif ($this->sample($profilesSampleRate)) {
+        //     $logger->info(\sprintf('Transaction [%s] started profiling because it was sampled.', (string) $transaction->getTraceId()));
 
-            $transaction->initProfiler()->start();
-        } else {
-            $logger->info(\sprintf('Transaction [%s] is not profiling because it was not sampled.', (string) $transaction->getTraceId()));
-        }
+        //     $transaction->initProfiler()->start();
+        // } else {
+        //     $logger->info(\sprintf('Transaction [%s] is not profiling because it was not sampled.', (string) $transaction->getTraceId()));
+        // }
 
         return $transaction;
     }
@@ -355,6 +361,33 @@ class Hub implements HubInterface
     public function getSpan(): ?Span
     {
         return $this->getScope()->getSpan();
+    }
+
+    public function startProfiler()
+    {
+        if ($this->profiler === null) {
+            $client = $this->getClient();
+            $options = $client !== null ? $client->getOptions() : null;
+
+            $this->profiler = new Profiler($options);
+            $this->profiler->start();
+        }
+
+        return $this->profiler;
+    }
+
+    public function stopProfiler()
+    {
+        if ($this->profiler !== null) {
+            $this->profiler->stop();
+            $profile = $this->profiler->getProfile();
+            if ($profile !== null) {
+                $event = Event::createProfileChunk();
+                $event->setSdkMetadata('profile', $profile);
+
+                return $this->captureEvent($event);
+            }
+        }
     }
 
     /**

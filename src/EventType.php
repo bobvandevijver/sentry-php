@@ -47,6 +47,11 @@ final class EventType implements \Stringable
         return self::getInstance('metrics');
     }
 
+    public static function profileChunk(): self
+    {
+        return self::getInstance('profile_chunk');
+    }
+
     /**
      * List of all cases on the enum.
      *

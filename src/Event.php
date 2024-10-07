@@ -232,6 +232,11 @@ final class Event
         return new self($eventId, EventType::metrics());
     }
 
+    public static function createProfileChunk(?EventId $eventId = null): self
+    {
+        return new self($eventId, EventType::profileChunk());
+    }
+
     /**
      * Gets the ID of this event.
      */

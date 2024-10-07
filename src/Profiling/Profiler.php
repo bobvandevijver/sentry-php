@@ -19,7 +19,7 @@ final class Profiler
     private $profiler;
 
     /**
-     * @var Profile
+     * @var ContinuousProfile
      */
     private $profile;
 
@@ -31,7 +31,8 @@ final class Profiler
     /**
      * @var float The sample rate (10.01ms/101 Hz)
      */
-    private const SAMPLE_RATE = 0.0101;
+    # private const SAMPLE_RATE = 0.0101;
+    private const SAMPLE_RATE = 0.001;
 
     /**
      * @var int The maximum stack depth
@@ -41,7 +42,8 @@ final class Profiler
     public function __construct(?Options $options = null)
     {
         $this->logger = $options !== null ? $options->getLoggerOrNullLogger() : new NullLogger();
-        $this->profile = new Profile($options);
+        // $this->profile = new Profile($options);
+        $this->profile = new ContinuousProfile($options);
 
         $this->initProfiler();
     }
@@ -57,12 +59,11 @@ final class Profiler
     {
         if ($this->profiler !== null) {
             $this->profiler->stop();
-
             $this->profile->setExcimerLog($this->profiler->flush());
         }
     }
 
-    public function getProfile(): ?Profile
+    public function getProfile(): ?ContinuousProfile
     {
         if ($this->profiler === null) {
             return null;

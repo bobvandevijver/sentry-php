@@ -152,4 +152,8 @@ interface HubInterface
      * Sets the span on the Hub.
      */
     public function setSpan(?Span $span): HubInterface;
+
+    public function startProfiler();
+    
+    public function stopProfiler();
 }
