@@ -173,6 +173,10 @@ final class Transaction extends Span
             }
         }
 
+        $this->setData([
+            'thread.id' => 0,
+        ]);
+
         $event = Event::createTransaction();
         $event->setSpans($finishedSpans);
         $event->setStartTimestamp($this->startTimestamp);
