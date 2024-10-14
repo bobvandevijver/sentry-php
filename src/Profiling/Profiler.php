@@ -7,6 +7,7 @@ namespace Sentry\Profiling;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Sentry\Options;
+use Sentry\Util\SentryUid;
 
 /**
  * @internal
@@ -28,6 +29,8 @@ final class Profiler
      */
     private $logger;
 
+    private $profiler_id;
+
     /**
      * @var float The sample rate (10.01ms/101 Hz)
      */
@@ -44,6 +47,7 @@ final class Profiler
         $this->logger = $options !== null ? $options->getLoggerOrNullLogger() : new NullLogger();
         // $this->profile = new Profile($options);
         $this->profile = new ContinuousProfile($options);
+        $this->profiler_id = SentryUid::generate();
 
         $this->initProfiler();
     }
@@ -70,6 +74,11 @@ final class Profiler
         }
 
         return $this->profile;
+    }
+
+    public function getProfilerId()
+    {
+        return $this->profiler_id;
     }
 
     private function initProfiler(): void

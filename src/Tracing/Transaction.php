@@ -180,6 +180,9 @@ final class Transaction extends Span
         $event->setTags($this->tags);
         $event->setTransaction($this->name);
         $event->setContext('trace', $this->getTraceContext());
+        $event->setContext('profile', [
+            'profiler_id' => $this->hub->getProfilerId(),
+        ]);
         $event->setSdkMetadata('dynamic_sampling_context', $this->getDynamicSamplingContext());
         $event->setSdkMetadata('transaction_metadata', $this->getMetadata());
 
