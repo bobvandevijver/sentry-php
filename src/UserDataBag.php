@@ -273,11 +273,11 @@ final class UserDataBag
      */
     public function merge(self $other): self
     {
-        $this->id = $other->id;
-        $this->email = $other->email;
-        $this->ipAddress = $other->ipAddress;
-        $this->username = $other->username;
-        $this->segment = $other->segment;
+        $this->id = $other->id ?? $this->id;
+        $this->email = $other->email ?? $this->email;
+        $this->ipAddress = $other->ipAddress ?? $this->ipAddress;
+        $this->username = $other->username ?? $this->username;
+        $this->segment = $other->segment ?? $this->segment;
         $this->metadata = array_merge($this->metadata, $other->metadata);
 
         return $this;
